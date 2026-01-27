@@ -1,14 +1,14 @@
-#1. Môi trường Python 3.11 bản nhẹ
-FROM python:3.11-slim
 
-#2. Thư mục làm việc bên trong máy ảo 
+FROM python:3.11-slim
+ 
 WORKDIR /app
 
-#3. Coppy danh sách thư viện
 COPY requirements.txt .
 
-#4. Cài đặt thư viện trong requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
+EXPOSE 8000
+
+CMD ["python", "-m", "uvicorn", "src.back_end.main:app", "--host", "0.0.0.0", "--port", "8000"]
