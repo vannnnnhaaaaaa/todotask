@@ -1,0 +1,52 @@
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>Shopee Admin Mini</title>
+    <style>
+        body { font-family: Arial; padding: 20px; text-align: center; margin-top: 200px;}
+        .product-item { background: #f4f4f4; margin: 5px; padding: 10px; border-radius: 5px; }
+    </style>
+
+</head>
+
+<body>
+    <h2>Thêm sản phẩm mới</h2>
+    <input type="text" id="productName" placeholder="Nhập tên sản phẩm...">
+    <button onclick="addProduct()">Thêm vào kho</button>
+    <h3>Danh sách trong kho  :</h3>
+    <div id="list"></div>
+    <script>
+        loadlist()
+        async function addProduct() {
+            task_name = document.getElementById("productName").value
+            await fetch("/tasks",{
+                method : 'POST' ,
+                headers : {'Content-Type': 'application/json'} ,
+                body : JSON.stringify({"title": task_name})
+            })
+            document.getElementById('productName').value = ''
+            loadlist()
+        } 
+
+        async function loadlist() {
+
+            const listDiv = document.getElementById('list');
+            listDiv.innerHTML = ""; 
+            console.log ("bien mat danh sach")
+            const response = await fetch('/tasks')
+            const data = await response.json()
+            data.forEach(item =>{
+                const taskDiv = document.createElement('div');
+                taskDiv.className = 'task-item';
+                taskDiv.innerHTML = `<strong>${item.title}</strong> - <span>${item.is_completed ? '✅ Đã làm xong ' : 'chưa làm xong'}</span>`
+                listDiv.appendChild(taskDiv)
+            })
+            console.log ("them danh sach")
+        }
+
+    </script>
+</body>
+
+</html>
