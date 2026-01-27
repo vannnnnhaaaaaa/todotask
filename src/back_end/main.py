@@ -22,7 +22,7 @@ def get_session ():
 
 @app.get("/")
 async def read_index():
-    return FileResponse('src/front-end/fontend.html')
+    return FileResponse('src/front_end/font_end.html')
 
 @app.get("/tasks" , response_model=list[TaskRead])
 def read_task (session : Session = Depends(get_session)) :
