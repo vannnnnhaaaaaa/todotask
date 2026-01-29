@@ -1,50 +1,18 @@
-from fastapi import FastAPI , Depends 
-from sqlmodel import Session , select 
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
-
-from .models import Task , TaskRead
-from .connect_database import engine 
-
-app =  FastAPI()
+from Router_api.user import user_router
+from Router_api.task import task_router
+from Router_api.taskapply   import router_task_apply
+app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # Cho phép tất cả các nguồn truy cập
+    # Nếu đang chạy Live Server ở cổng 5500, nên điền rõ để an toàn
+    allow_origins=["*"], 
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-def get_session ():
-    with Session(engine) as session :
-        yield session
-
-@app.get("/")
-async def read_index():
-    return FileResponse('src/front_end/font_end.html')
-
-@app.get("/tasks" , response_model=list[TaskRead])
-def read_task (session : Session = Depends(get_session)) :
-    tasks = session.exec(select(Task)).all()
-    return tasks
-
-
-@app.post("/tasks" , response_model=TaskRead)
-def post_task (task : Task ,session :Session = Depends(get_session)):
-    session.add(task)
-    session.commit()
-    session.refresh(task)
-    return task
-
-    
-
-@app.patch("/tasks/{task_id}" , response_model=Task)
-def update_task (task_id : int , session : Session = Depends(get_session)) :
-    db_task = session.get(Task , task_id)
-    if db_task :
-        db_task.is_completed = not db_task.is_completed
-        session.add(db_task)
-        session.commit()
-        session.refresh(db_task)
-    return db_task
+app.include_router(user_router, prefix="/users", tags=["Users"])
+app.include_router(task_router, prefix="/tasks", tags=["Task"])
+app.include_router(router_task_apply, prefix="/taskapply", tags=["Taskapply"])
